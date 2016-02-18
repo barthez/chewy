@@ -38,4 +38,23 @@ namespace :chewy do
       Chewy::RakeHelper.update_all
     end
   end
+
+  desc 'Migrates data for specified index'
+  task :migrate, [:index] => :environment do |task, args|
+    Chewy::RakeHelper.subscribe_task_stats!
+
+    if args[:index].present?
+      Chewy::RakeHelper.migrate_index(args[:index])
+    else
+      Chewy::RakeHelper.migrate_all
+    end
+  end
+
+  namespace :migrate do
+    desc 'Migrates data for all found indexes'
+    task all: :environment do
+      Chewy::RakeHelper.subscribe_task_stats!
+      Chewy::RakeHelper.migrate_all
+    end
+  end
 end

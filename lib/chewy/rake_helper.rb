@@ -57,6 +57,19 @@ module Chewy
         eager_load_chewy!
         Chewy::Index.descendants.each { |index| update_index index }
       end
+
+      def migrate_index index
+        if normalize_index(index).needs_migration?
+          reset_index index
+        else
+          update_index index
+        end
+      end
+
+      def migrate_all
+        eager_load_chewy!
+        Chewy::Index.descendants.each { |index| migrate_index index }
+      end
     end
   end
 end
