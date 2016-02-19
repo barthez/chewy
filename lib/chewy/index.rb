@@ -2,12 +2,14 @@ require 'chewy/search'
 require 'chewy/index/actions'
 require 'chewy/index/aliases'
 require 'chewy/index/settings'
+require 'chewy/index/migrations'
 
 module Chewy
   class Index
     include Search
     include Actions
     include Aliases
+    include Migrations
 
     singleton_class.delegate :client, to: 'Chewy'
 
@@ -35,14 +37,14 @@ module Chewy
         @index_name ||= begin
           build_index_name(
             name.sub(/Index\Z/, '').demodulize.underscore,
-            prefix: default_prefix 
+            prefix: default_prefix
           ) if name
         end
       end
       @index_name or raise UndefinedIndex
     end
 
-    # Prefix to use 
+    # Prefix to use
     #
     def self.default_prefix
       Chewy.configuration[:prefix]

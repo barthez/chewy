@@ -1,6 +1,3 @@
-require 'pp'
-require 'pry'
-
 module Chewy
   class Index
     # Module provides per-index actions, such as deletion,
@@ -16,38 +13,6 @@ module Chewy
         #
         def exists?
           client.indices.exists(index: index_name)
-        end
-
-        def needs_migration?
-          current_index = client
-            .indices
-            .get(index: index_name, feature: %w[_mapping _settings])
-            .each_value.first
-
-          if current_index['settings'] && current_index['settings']['index']
-            current_index['settings']['analysis'] = current_index['settings']['index'].delete('analysis') if current_index['settings']['index']['analysis']
-            current_index['settings']['index'].delete('creation_date')
-            current_index['settings']['index'].delete('version')
-            current_index['settings']['index'].delete('uuid')
-          end
-
-          pp(index_params.deep_stringify_keys)
-          pp('*****')
-          pp(current_index)
-
-          merge = index_params.deep_stringify_keys.deep_merge(current_index) do |key, v1, v2|
-            if v2.is_a?(String) && v1.to_s == v2
-              v2
-            else
-              v1
-            end
-          end
-
-          binding.pry
-
-          index_params.deep_stringify_keys != current_index
-        rescue Elasticsearch::Transport::Transport::Errors::NotFound
-          true
         end
 
         # Creates index and applies mappings and settings.
